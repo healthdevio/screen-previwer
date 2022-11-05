@@ -10,6 +10,7 @@ export class GetScreenshotController {
     this.browser = null;
     puppeteer
       .launch({
+        args: [ '--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote' ],
         defaultViewport: {
           width: 1280,
           height: 720,

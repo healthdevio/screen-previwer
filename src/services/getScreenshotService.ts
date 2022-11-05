@@ -2,7 +2,7 @@ import { Response } from "express";
 import { Browser } from "puppeteer";
 import path from "path";
 import { FillLocalStorage } from "../utils/fillLocalStorage";
-import fs from 'fs';
+import fs from "fs";
 
 export class GetScreenshotService {
   fillLocalStorageService: FillLocalStorage;
@@ -16,7 +16,6 @@ export class GetScreenshotService {
     url: string,
     res: Response
   ) {
-
     if (!token) {
       throw new Error("Unauthorized");
     }
@@ -50,7 +49,7 @@ export class GetScreenshotService {
     }, newToken);
     await page.goto(url, { waitUntil: "networkidle2" });
     const filepath = path.resolve(__dirname, "..", "files");
-    const filename =  `file_${Math.random() * 10000000000099}.png`;
+    const filename = `file_${Math.round(Math.random() * 10000000000099)}.png`;
     const file = await page.screenshot({
       path: path.join(filepath, filename),
       clip: { height: 720, width: 1280, x: 0, y: 0 },
@@ -60,7 +59,7 @@ export class GetScreenshotService {
     const stream = fs.createReadStream(path.join(filepath, filename));
     stream.pipe(res);
     await page.close();
-    
+
     setTimeout(() => {}, 4500);
     fs.unlinkSync(path.join(filepath, filename));
     // return res.status(200).json({ error: false, message: "Deu bom" });
