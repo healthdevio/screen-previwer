@@ -52,7 +52,7 @@ export class GetScreenshotService {
     const openInitialTime = new Date().getTime();
     await page.goto(url, { waitUntil: "networkidle2" });
     const openFinalTime = new Date().getTime();
-    const openTime = Math.round((openFinalTime - openInitialTime) * 1000);
+    const openTime = Math.round((openFinalTime - openInitialTime) / 1000);
     console.log("Page is Rendered in " + openTime);
     
     const filepath = path.resolve(__dirname, "..", "files");
@@ -66,7 +66,7 @@ export class GetScreenshotService {
       type: "webp",
     });
     const screenshotFinalTime = new Date().getTime();
-    const screenshotTime = Math.round((screenshotFinalTime - screenshotInitialTime) * 1000);
+    const screenshotTime = Math.round((screenshotFinalTime - screenshotInitialTime) / 1000);
     console.log("Screenshot taked in " + screenshotTime);
     console.log("The stream total time: " + screenshotTime + openTime);
     
