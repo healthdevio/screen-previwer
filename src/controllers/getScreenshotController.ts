@@ -24,6 +24,7 @@ export class GetScreenshotController {
       });
   }
   handle = async (req: Request, res: Response) => { //Não altere de arrow fucntion para named function
+    res.setHeader('Cache-Control', 'max-age=300')
     try {
       const { scale } = req.query;
       const multiplier = scale ? Number(scale) : 1;
