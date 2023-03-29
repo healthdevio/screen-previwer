@@ -15,7 +15,7 @@ export class GetScreenshotService {
     token: string,
     url: string,
     res: Response,
-    scale?: number 
+    scale?: number
   ) {
     const multiplier = scale ? scale : 1;
     if (!token) {
@@ -52,7 +52,11 @@ export class GetScreenshotService {
     await page.goto(url, { waitUntil: "networkidle2" });
     const filepath = path.resolve(__dirname, "..", "files");
     const filename = `file_${Math.round(Math.random() * 10000000000099)}.png`;
-    const file = await page.screenshot({
+    page.setViewport({
+      height: 720 * multiplier,
+      width: 1280 * multiplier,
+    });
+    await page.screenshot({
       path: path.join(filepath, filename),
       clip: { height: 720 * multiplier, width: 1280 * multiplier, x: 0, y: 0 },
     });
