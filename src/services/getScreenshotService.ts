@@ -52,13 +52,11 @@ export class GetScreenshotService {
     await page.goto(url, { waitUntil: "networkidle2" });
     const filepath = path.resolve(__dirname, "..", "files");
     const filename = `file_${Math.round(Math.random() * 10000000000099)}.png`;
-    page.setViewport({
-      height: 720 * multiplier,
-      width: 1280 * multiplier,
-    });
     await page.screenshot({
       path: path.join(filepath, filename),
-      clip: { height: 720 * multiplier, width: 1280 * multiplier, x: 0, y: 0 },
+      clip: { height: 720, width: 1280, x: 0, y: 0 },
+      quality: 100 * multiplier,
+      type: "webp",
     });
     // const file = fs.readFileSync(filename);
     res.setHeader("Content-Type", "image/png");
