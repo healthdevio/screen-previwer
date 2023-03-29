@@ -23,6 +23,8 @@ export class GetScreenshotController {
   }
   handle = async (req: Request, res: Response) => { //Não altere de arrow fucntion para named function
     try {
+      const { scale } = req.query;
+      const multiplier = scale ? Number(scale) : 1;
       if (!this.browser) {
         return res
           .status(400)
@@ -34,7 +36,8 @@ export class GetScreenshotController {
         (req.headers["authorization"] as string) ||
           (req.query["token"] as string),
         req.query["url"] as string,
-        res
+        res,
+        multiplier
       );
     } catch (error: any) {
       return res

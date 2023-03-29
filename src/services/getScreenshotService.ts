@@ -14,8 +14,10 @@ export class GetScreenshotService {
     browser: Browser,
     token: string,
     url: string,
-    res: Response
+    res: Response,
+    scale?: number 
   ) {
+    const multiplier = scale ? scale : 1;
     if (!token) {
       throw new Error("Unauthorized");
     }
@@ -52,7 +54,7 @@ export class GetScreenshotService {
     const filename = `file_${Math.round(Math.random() * 10000000000099)}.png`;
     const file = await page.screenshot({
       path: path.join(filepath, filename),
-      clip: { height: 720, width: 1280, x: 0, y: 0 },
+      clip: { height: 720 * multiplier, width: 1280 * multiplier, x: 0, y: 0 },
     });
     // const file = fs.readFileSync(filename);
     res.setHeader("Content-Type", "image/png");
