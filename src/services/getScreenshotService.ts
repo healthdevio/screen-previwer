@@ -59,7 +59,7 @@ export class GetScreenshotService {
       type: "webp",
     });
     // const file = fs.readFileSync(filename);
-    res.setHeader("Content-Type", "image/png");
+    res.setHeader("Content-Type", "image/webp");
     const stream = fs.createReadStream(path.join(filepath, filename));
     stream.pipe(res);
     await page.close();
