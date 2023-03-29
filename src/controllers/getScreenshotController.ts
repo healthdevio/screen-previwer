@@ -11,6 +11,8 @@ export class GetScreenshotController {
     puppeteer
       .launch({
         args: [ '--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote' ],
+        waitForInitialPage: false,
+        headless: true,
         defaultViewport: {
           width: 1280,
           height: 720,

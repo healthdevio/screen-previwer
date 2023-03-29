@@ -49,7 +49,7 @@ export class GetScreenshotService {
         ])
       );
     }, newToken);
-    await page.goto(url, { waitUntil: "networkidle2" });
+    await page.goto(url, { waitUntil: "networkidle0" });
     const filepath = path.resolve(__dirname, "..", "files");
     const filename = `file_${Math.round(Math.random() * 10000000000099)}.png`;
     await page.screenshot({
