@@ -57,7 +57,10 @@ export class GetScreenshotService {
     await page.goto(url, { waitUntil: "networkidle2" });
 
 
-    const filepath = path.resolve(__dirname, "..", "files");
+    const filepath = path.join(__dirname, "..", "files");
+    if(!fs.existsSync(filepath)){
+      fs.mkdirSync(filepath)
+    }
     const filename = `file_${Math.round(Math.random() * 10000000000099)}.png`;
     const screenshotInitialTime = new Date().getTime();
     console.log("Initializing screenshot page browser");

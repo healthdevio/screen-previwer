@@ -5,7 +5,8 @@
   "author": "healthdev-io",
   "license": "MIT",
   "scripts": {
-    "start:dev": "tsnd src/main.ts"
+    "start:dev": "tsnd src/main.ts",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/express": "^4.17.14",

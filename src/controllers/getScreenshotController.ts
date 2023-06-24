@@ -13,6 +13,7 @@ export class GetScreenshotController {
         args: [ '--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote' ],
         waitForInitialPage: false,
         headless: true,
+        executablePath: '/usr/bin/chromium-browser',
         defaultViewport: {
           width: 1280,
           height: 720,

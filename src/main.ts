@@ -5,6 +5,6 @@ const app = express();
 app.use(express.json());
 app.use(Routes);
 
-app.listen(3333, () => {
-  console.log("Server is running on port 3333");
+app.listen(80, () => {
+  console.log("Server is running on port 80");
 });
