@@ -10,14 +10,18 @@ export class GetScreenshotController {
     this.browser = null;
     puppeteer
       .launch({
-        args: [ '--disable-gpu', '--disable-setuid-sandbox', '--no-sandbox', '--no-zygote' ],
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+        ],
+        headless: 'new',
         waitForInitialPage: false,
-        headless: true,
-        executablePath: '/usr/bin/chromium-browser',
-        defaultViewport: {
-          width: 1280,
-          height: 720,
-        },
       })
       .then(async (browser) => {
         console.log("Pupperteer browser initialized");
