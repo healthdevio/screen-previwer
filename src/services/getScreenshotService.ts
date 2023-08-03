@@ -33,7 +33,7 @@ export class GetScreenshotService {
       throw new Error("URL é obrigatório");
     }
 
-    const cacheKey = `${decoded?.sub}:${decoded?.service_location_id}`;
+    const cacheKey = `${decoded?.sub}:${decoded?.service_location_id}${url}`;
     const cachedValue = cache.get(cacheKey);
     const filepath = path.join(__dirname, "..", "files");
     if (!fs.existsSync(filepath)) {
