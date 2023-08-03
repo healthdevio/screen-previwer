@@ -75,5 +75,7 @@ RUN echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repos
       ttf-freefont \
       chromium
 
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
 # Start the server using the production build
 CMD [ "node", "dist/main.js" ]

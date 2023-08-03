@@ -22,6 +22,10 @@ export class GetScreenshotController {
         ],
         headless: 'new',
         waitForInitialPage: false,
+        defaultViewport: {
+          width: 1280,
+          height: 720,
+        },
       })
       .then(async (browser) => {
         console.log("Pupperteer browser initialized");
