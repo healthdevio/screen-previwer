@@ -1,5 +1,6 @@
 import { Response } from "express";
 import fs from "fs";
+import jwt from 'jsonwebtoken';
 import cache from 'memory-cache';
 import path from "path";
 import { Browser } from "puppeteer";
@@ -22,6 +23,8 @@ export class GetScreenshotService {
     const page = await browser.newPage();
     const newToken = token.replace("Bearer ", "");
 
+    const decoded = jwt.decode(newToken) as any;
+    
     if (!token) {
       throw new Error("Unauthorized");
     }
@@ -30,7 +33,7 @@ export class GetScreenshotService {
       throw new Error("URL é obrigatório");
     }
 
-    const cacheKey = `${url}:${newToken}`;
+    const cacheKey = `${decoded?.sub}:${decoded?.service_location_id}`;
     const cachedValue = cache.get(cacheKey);
     const filepath = path.join(__dirname, "..", "files");
     if (!fs.existsSync(filepath)) {
