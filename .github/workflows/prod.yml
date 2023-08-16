@@ -1,0 +1,64 @@
+name: SSH Deploy
+
+on:
+  push:
+    branches:
+      - release 
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: ecr-screen-previewer
+  ECS_SERVICE: screen-previewer-service
+  ECS_CLUSTER_QA: saudehd-cluster-qa
+  ECS_CLUSTER_PROD: saudehd-cluster-prod
+  ECS_TASK_DEFINITION_QA: .github/workflows/qa/task-definition.json
+  ECS_TASK_DEFINITION_PROD: .github/workflows/prod/task-definition.json
+  CONTAINER_NAME_QA: screen-previewer-qa
+  CONTAINER_NAME_PROD: screen-previewer-prod
+  PROD_SERVER_ADDRESS: prod.api.saudehd.com.br
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: latest
+      run: |
+        docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
+        docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+    - name: Connect to SSH and deploy
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        ssh -o StrictHostKeyChecking=no -i $SSH_AUTH_SOCK root@$PROD_SERVER_ADDRESS 'bash -s' << 'ENDSSH'
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 383274777803.dkr.ecr.us-east-1.amazonaws.com
+          docker rmi -f 383274777803.dkr.ecr.us-east-1.amazonaws.com/ecr-screen-previewer:latest
+          docker rm -f screen
+          docker run --name screen -d -p 8093:80 --network prod 383274777803.dkr.ecr.us-east-1.amazonaws.com/ecr-screen-previewer:latest
+        ENDSSH
