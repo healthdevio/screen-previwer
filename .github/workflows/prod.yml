@@ -60,5 +60,5 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 383274777803.dkr.ecr.us-east-1.amazonaws.com
           docker rmi -f 383274777803.dkr.ecr.us-east-1.amazonaws.com/ecr-screen-previewer:latest
           docker rm -f screen
-          docker run --name screen -d -p 8093:80 --network prod 383274777803.dkr.ecr.us-east-1.amazonaws.com/ecr-screen-previewer:latest
+          docker run --name screen -d -p 9097:80 --network prod 383274777803.dkr.ecr.us-east-1.amazonaws.com/ecr-screen-previewer:latest
         ENDSSH
