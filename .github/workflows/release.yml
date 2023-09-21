@@ -3,19 +3,16 @@ name: SSH Deploy
 on:
   push:
     branches:
-      - release 
+      - release  # Defina a branch na qual deseja acionar o deploy
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: ecr-screen-previewer
-  ECS_SERVICE: screen-previewer-service
-  ECS_CLUSTER_QA: saudehd-cluster-qa
-  ECS_CLUSTER_PROD: saudehd-cluster-prod
-  ECS_TASK_DEFINITION_QA: .github/workflows/qa/task-definition.json
-  ECS_TASK_DEFINITION_PROD: .github/workflows/prod/task-definition.json
-  CONTAINER_NAME_QA: screen-previewer-qa
-  CONTAINER_NAME_PROD: screen-previewer-prod
-  PROD_SERVER_ADDRESS: prod.api.saudehd.com.br
+  SERVER_ADDRESS: tools.s4sbr.com
+  SERVICE_NAME: screen
+  SERVICE_PORT: 8082
+  ENVIRONMENT_BUCKET_NAME: saudehd-environments
+  ENVIRONMENT: tools
+  DOCKER_NETWORK: tools
 
 jobs:
   deploy:
@@ -28,7 +25,13 @@ jobs:
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.4.1
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        ssh-private-key: ${{ secrets.RELEASE_SSH_PRIVATE_KEY }}
+
+    - name: Set ECR_REPOSITORY
+      run: |
+        # Concatenar variáveis e definir uma nova variável
+        ECR_REPOSITORY="ecr-tools-${SERVICE_NAME}"
+        echo "ECR_REPOSITORY=${ECR_REPOSITORY}" >> $GITHUB_ENV
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -55,10 +58,12 @@ jobs:
     - name: Connect to SSH and deploy
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: latest
       run: |
-        ssh -o StrictHostKeyChecking=no -i $SSH_AUTH_SOCK root@$PROD_SERVER_ADDRESS 'bash -s' << 'ENDSSH'
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 383274777803.dkr.ecr.us-east-1.amazonaws.com
-          docker rmi -f 383274777803.dkr.ecr.us-east-1.amazonaws.com/ecr-screen-previewer:latest
-          docker rm -f screen
-          docker run --name screen -d -p 9097:80 --network prod 383274777803.dkr.ecr.us-east-1.amazonaws.com/ecr-screen-previewer:latest
-        ENDSSH
+          ssh -o StrictHostKeyChecking=no -i $SSH_AUTH_SOCK root@$SERVER_ADDRESS 'bash -s' << 'ENDSSH'
+            aws ecr get-login-password --region ${{env.AWS_REGION}} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
+            docker rmi -f ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+            docker rm -f ${{env.SERVICE_NAME}}
+            docker run --name ${{env.SERVICE_NAME}} -d -p ${{env.SERVICE_PORT}}:80 --network ${{env.DOCKER_NETWORK}} ${{env.ECR_REGISTRY}}/${{env.ECR_REPOSITORY}}:${{env.IMAGE_TAG}}
+          ENDSSH
+      
